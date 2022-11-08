@@ -18,7 +18,7 @@ def retry(max_retries):
                 except requests.exceptions.RequestException as e:
                     logger.warning(e)
                     attempts += 1
-                    time.sleep(random.randint(10, 25))
+                    time.sleep(random.uniform(10, 25))
 
         return retry_wrapper
     return decorator
@@ -27,7 +27,7 @@ def retry(max_retries):
 def delay_request(max_sleep_time=3):
     def decorator(func):
         def wait_wrapper(*args, **kwargs):
-            delay_seconds = random.random() * max_sleep_time
+            delay_seconds = random.uniform(0, max_sleep_time)
             logger.debug(f'Sleeping for {delay_seconds} seconds')
             time.sleep(delay_seconds)
             return func(*args, **kwargs)

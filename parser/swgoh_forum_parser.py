@@ -49,14 +49,14 @@ class SwgohForumParser:
     def _get_posts_urls_from_page(self) -> list[str]:
         response = requests.get(url=self.url + f'/p{self.page}/', headers=headers)
         soup = BeautifulSoup(response.text, 'lxml')
-        page_links_tags = soup.find(class_='DataTable DiscussionsTable').find_all('a', class_='Title')
-        page_links = [tag['href'] for tag in page_links_tags]
+        post_links_tags = soup.find(class_='DataTable DiscussionsTable').find_all('a', class_='Title')
+        post_links = [tag['href'] for tag in post_links_tags]
 
-        return page_links
+        return post_links
 
     @retry(3)
     @delay_request(3)
-    def _parse_page(self, url: str) -> Post:
+    def _parse_post(self, url: str) -> Post:
         url_slug = url.split('/')[-1]
         logger.info(f'Get content from page {url_slug}')
 
@@ -83,7 +83,7 @@ class SwgohForumParser:
     def parse(self, num_links: int):
         links = self._get_posts_urls(num_links)
 
-        parsed_posts = Posts([self._parse_page(link) for link in links])
+        parsed_posts = Posts([self._parse_post(link) for link in links])
         return parsed_posts
 
 
@@ -92,5 +92,5 @@ parser = SwgohForumParser()
 parser.set_url(GAME_NEWS_URL)
 posts = parser.parse(15)
 
-with open('results.json', 'w') as f:
+with open('../results.json', 'w') as f:
     f.write(json.dumps(asdict(posts), indent=4, ensure_ascii=False))
